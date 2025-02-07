@@ -34,6 +34,8 @@ export const translations = {
   Yearly: "Årlig",
   "End Date": "Slutdato",
   Optional: "Valgfri",
+  Add: "Tilføj",
+  Savings: "Opsparing",
 };
 
 type TranslationKey = keyof typeof translations;

@@ -1,71 +1,90 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useFinance } from "../contexts/FinanceContext"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { t } from "../utils/translations"
+import { useState, useEffect } from "react";
+import { IncomeExpense, useFinance } from "../contexts/FinanceContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { t } from "../utils/translations";
 
 type AddEditItemModalProps = {
-  isOpen: boolean
-  onClose: () => void
-  editingItem: any
-  selectedDate: Date
-}
+  isOpen: boolean;
+  onClose: () => void;
+  editingItem: IncomeExpense;
+  selectedDate: Date;
+};
 
-export default function AddEditItemModal({ isOpen, onClose, editingItem, selectedDate }: AddEditItemModalProps) {
-  const { addItem, editItem } = useFinance()
-  const [item, setItem] = useState({
+export default function AddEditItemModal({
+  isOpen,
+  onClose,
+  editingItem,
+  selectedDate,
+}: AddEditItemModalProps) {
+  const { addItem, editItem } = useFinance();
+  const [item, setItem] = useState<IncomeExpense>({
     id: "",
     type: "income",
     name: "",
-    amount: "",
+    amount: 0,
     recurrence: "once",
     endDate: "",
-  })
+  });
 
   useEffect(() => {
     if (editingItem) {
-      setItem(editingItem)
+      setItem(editingItem);
     } else {
       setItem({
         id: "",
         type: "income",
         name: "",
-        amount: "",
+        amount: 0,
         recurrence: "once",
         endDate: "",
-      })
+      });
     }
-  }, [editingItem])
+  }, [editingItem]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const year = selectedDate.getFullYear().toString()
-    const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0")
+    e.preventDefault();
+    const year = selectedDate.getFullYear().toString();
+    const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
 
     const newItem = {
       ...item,
-      amount: Number.parseFloat(item.amount as string),
+      amount: item.amount,
       id: editingItem ? item.id : Date.now().toString(),
-    }
+    };
 
     if (editingItem) {
-      editItem(year, month, newItem)
+      editItem(year, month, newItem);
     } else {
-      addItem(year, month, newItem)
+      addItem(year, month, newItem);
     }
-    onClose()
-  }
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{editingItem ? t("Edit Income/Expense") : t("Add Income/Expense")}</DialogTitle>
+          <DialogTitle>
+            {editingItem ? t("Edit Income/Expense") : t("Add Income/Expense")}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -73,7 +92,9 @@ export default function AddEditItemModal({ isOpen, onClose, editingItem, selecte
               <Label htmlFor="type">{t("Type")}</Label>
               <Select
                 value={item.type}
-                onValueChange={(value) => setItem({ ...item, type: value as "income" | "expense" })}
+                onValueChange={(value) =>
+                  setItem({ ...item, type: value as "income" | "expense" })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t("Select type")} />
@@ -99,7 +120,7 @@ export default function AddEditItemModal({ isOpen, onClose, editingItem, selecte
                 id="amount"
                 type="number"
                 value={item.amount}
-                onChange={(e) => setItem({ ...item, amount: e.target.value })}
+                onChange={(e) => setItem({ ...item, amount: +e.target.value })}
                 required
               />
             </div>
@@ -108,7 +129,14 @@ export default function AddEditItemModal({ isOpen, onClose, editingItem, selecte
               <Select
                 value={item.recurrence}
                 onValueChange={(value) =>
-                  setItem({ ...item, recurrence: value as "once" | "monthly" | "quarterly" | "yearly" })
+                  setItem({
+                    ...item,
+                    recurrence: value as
+                      | "once"
+                      | "monthly"
+                      | "quarterly"
+                      | "yearly",
+                  })
                 }
               >
                 <SelectTrigger>
@@ -131,17 +159,20 @@ export default function AddEditItemModal({ isOpen, onClose, editingItem, selecte
                   id="endDate"
                   type="date"
                   value={item.endDate}
-                  onChange={(e) => setItem({ ...item, endDate: e.target.value })}
+                  onChange={(e) =>
+                    setItem({ ...item, endDate: e.target.value })
+                  }
                 />
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button type="submit">{editingItem ? t("Update") : t("Add")}</Button>
+            <Button type="submit">
+              {editingItem ? t("Update") : t("Add")}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

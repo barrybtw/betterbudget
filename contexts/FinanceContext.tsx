@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-type IncomeExpense = {
+export type IncomeExpense = {
   id: string;
   type: "income" | "expense";
   name: string;
