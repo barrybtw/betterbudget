@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<IncomeExpense>(
-    {} as IncomeExpense
+    null as any as IncomeExpense
   );
 
   console.log("Dashboard financeData:", financeData);
@@ -50,7 +50,7 @@ export default function Dashboard() {
           isOpen={isModalOpen}
           onClose={() => {
             setIsModalOpen(false);
-            setEditingItem({} as IncomeExpense);
+            setEditingItem(null as any as IncomeExpense);
           }}
           editingItem={editingItem}
           selectedDate={selectedDate}

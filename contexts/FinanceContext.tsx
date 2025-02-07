@@ -237,8 +237,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
     setGoals((prev) => prev.filter((g) => g.id !== id));
   };
 
-  console.log("Current financeData:", financeData);
-
   return (
     <FinanceContext.Provider
       value={{
