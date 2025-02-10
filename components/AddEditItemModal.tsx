@@ -35,24 +35,28 @@ export default function AddEditItemModal({
   selectedDate,
 }: AddEditItemModalProps) {
   const { addItem, editItem } = useFinance();
-  const [item, setItem] = useState<IncomeExpense>({
+  const [item, setItem] = useState({
     id: "",
     type: "income",
     name: "",
-    amount: 0,
+    amount: "",
     recurrence: "once",
     endDate: "",
   });
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (editingItem) {
-      setItem(editingItem);
+      setItem({
+        ...editingItem,
+        amount: editingItem.amount.toString(),
+      });
     } else {
       setItem({
         id: "",
         type: "income",
         name: "",
-        amount: 0,
+        amount: "",
         recurrence: "once",
         endDate: "",
       });
@@ -66,16 +70,51 @@ export default function AddEditItemModal({
 
     const newItem = {
       ...item,
-      amount: item.amount,
+      amount: Number.parseFloat(item.amount) || 0,
       id: editingItem ? item.id : Date.now().toString(),
-    } satisfies IncomeExpense;
+    };
+
+    if (newItem.type !== "income" && newItem.type !== "expense") {
+      return;
+    }
 
     if (editingItem) {
-      editItem(year, month, newItem);
+      editItem(year, month, newItem as IncomeExpense);
     } else {
-      addItem(year, month, newItem);
+      addItem(year, month, newItem as IncomeExpense);
     }
     onClose();
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      setItem({ ...item, amount: value });
+    }
+  };
+
+  const handleAmountFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleAmountBlur = () => {
+    setIsFocused(false);
+    if (item.amount === "") {
+      setItem({ ...item, amount: "0" });
+    } else {
+      // Ensure the amount is a valid number with at most 2 decimal places
+      const formattedAmount = Number.parseFloat(item.amount).toFixed(2);
+      setItem({ ...item, amount: formattedAmount });
+    }
+  };
+
+  const formatAmount = (amount: string) => {
+    const num = Number.parseFloat(amount);
+    if (isNaN(num)) return "";
+    return num.toLocaleString("da-DK", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   return (
@@ -118,9 +157,12 @@ export default function AddEditItemModal({
               <Label htmlFor="amount">{t("Amount")} (DKK)</Label>
               <Input
                 id="amount"
-                type="number"
-                value={item.amount}
-                onChange={(e) => setItem({ ...item, amount: +e.target.value })}
+                type="text"
+                inputMode="decimal"
+                value={isFocused ? item.amount : formatAmount(item.amount)}
+                onChange={handleAmountChange}
+                onFocus={handleAmountFocus}
+                onBlur={handleAmountBlur}
                 required
               />
             </div>
@@ -166,8 +208,8 @@ export default function AddEditItemModal({
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button type="submit" className="mt-4">
+          <DialogFooter className="mt-6">
+            <Button type="submit">
               {editingItem ? t("Update") : t("Add")}
             </Button>
           </DialogFooter>
