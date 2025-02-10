@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useFinance } from "../contexts/FinanceContext";
+import { IncomeExpense, useFinance } from "../contexts/FinanceContext";
 import {
   Dialog,
   DialogContent,
@@ -35,11 +35,11 @@ export default function AddEditItemModal({
   selectedDate,
 }: AddEditItemModalProps) {
   const { addItem, editItem } = useFinance();
-  const [item, setItem] = useState({
+  const [item, setItem] = useState<IncomeExpense>({
     id: "",
     type: "income",
     name: "",
-    amount: "",
+    amount: 0,
     recurrence: "once",
     endDate: "",
   });
@@ -52,7 +52,7 @@ export default function AddEditItemModal({
         id: "",
         type: "income",
         name: "",
-        amount: "",
+        amount: 0,
         recurrence: "once",
         endDate: "",
       });
@@ -66,9 +66,9 @@ export default function AddEditItemModal({
 
     const newItem = {
       ...item,
-      amount: Number.parseFloat(item.amount as string),
+      amount: item.amount,
       id: editingItem ? item.id : Date.now().toString(),
-    };
+    } satisfies IncomeExpense;
 
     if (editingItem) {
       editItem(year, month, newItem);
@@ -120,7 +120,7 @@ export default function AddEditItemModal({
                 id="amount"
                 type="number"
                 value={item.amount}
-                onChange={(e) => setItem({ ...item, amount: e.target.value })}
+                onChange={(e) => setItem({ ...item, amount: +e.target.value })}
                 required
               />
             </div>

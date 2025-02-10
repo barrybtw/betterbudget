@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-type IncomeExpense = {
+export type IncomeExpense = {
   id: string;
   type: "income" | "expense";
   name: string;
@@ -11,7 +11,7 @@ type IncomeExpense = {
   endDate?: string; // Optional end date for recurring items
 };
 
-type Goal = {
+export type Goal = {
   id: string;
   name: string;
   amount: number;
@@ -20,7 +20,7 @@ type Goal = {
   currentSavings: number;
 };
 
-type FinanceData = {
+export type FinanceData = {
   [year: string]: {
     [month: string]: {
       incomes: IncomeExpense[];
@@ -29,7 +29,7 @@ type FinanceData = {
   };
 };
 
-type FinanceContextType = {
+export type FinanceContextType = {
   financeData: FinanceData;
   goals: Goal[];
   addItem: (year: string, month: string, item: IncomeExpense) => void;
