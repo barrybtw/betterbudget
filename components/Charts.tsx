@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useFinance } from "../contexts/FinanceContext"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useFinance } from "../contexts/FinanceContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
   Line,
@@ -14,52 +14,72 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts"
-import { t } from "../utils/translations"
+} from "recharts";
+import { t } from "../utils/translations";
 
 type ChartsProps = {
-  selectedDate: Date
-}
+  selectedDate: Date;
+};
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D"]
+const COLORS = [
+  "#60a5fa",
+  "#34d399",
+  "#fbbf24",
+  "#f87171",
+  "#a78bfa",
+  "#2dd4bf",
+];
 
 export default function Charts({ selectedDate }: ChartsProps) {
-  const { financeData } = useFinance()
+  const { financeData } = useFinance();
 
-  const year = selectedDate.getFullYear().toString()
-  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0")
-  const monthData = financeData[year]?.[month] || { incomes: [], expenses: [] }
+  const year = selectedDate.getFullYear().toString();
+  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+  const monthData = financeData[year]?.[month] || { incomes: [], expenses: [] };
 
   const incomeData = monthData.incomes.map((income) => ({
     name: income.name,
     value: income.amount,
-  }))
+  }));
 
   const expenseData = monthData.expenses.map((expense) => ({
     name: expense.name,
     value: expense.amount,
-  }))
+  }));
 
-  const monthlyData = Object.entries(financeData[year] || {}).map(([month, data]) => {
-    const totalIncome = data.incomes.reduce((sum, income) => sum + income.amount, 0)
-    const totalExpense = data.expenses.reduce((sum, expense) => sum + expense.amount, 0)
-    return {
-      name: month,
-      income: totalIncome,
-      expense: totalExpense,
-      savings: totalIncome - totalExpense,
+  const monthlyData = Object.entries(financeData[year] || {}).map(
+    ([month, data]) => {
+      const totalIncome = data.incomes.reduce(
+        (sum, income) => sum + income.amount,
+        0
+      );
+      const totalExpense = data.expenses.reduce(
+        (sum, expense) => sum + expense.amount,
+        0
+      );
+      return {
+        name: month,
+        income: totalIncome,
+        expense: totalExpense,
+        savings: totalIncome - totalExpense,
+      };
     }
-  })
+  );
 
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("da-DK", { style: "currency", currency: "DKK" })
-  }
+    return value.toLocaleString("da-DK", {
+      style: "currency",
+      currency: "DKK",
+    });
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-      <Card>
+      <Card className="dark:bg-black">
         <CardHeader>
-          <CardTitle>{t("Monthly Overview")}</CardTitle>
+          <CardTitle className="dark:text-white">
+            {t("Monthly Overview")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -69,16 +89,33 @@ export default function Charts({ selectedDate }: ChartsProps) {
               <YAxis tickFormatter={formatCurrency} />
               <Tooltip formatter={formatCurrency} />
               <Legend />
-              <Line type="monotone" dataKey="income" name={t("Income")} stroke="#8884d8" />
-              <Line type="monotone" dataKey="expense" name={t("Expense")} stroke="#82ca9d" />
-              <Line type="monotone" dataKey="savings" name={t("Savings")} stroke="#ffc658" />
+              <Line
+                type="monotone"
+                dataKey="income"
+                name={t("Income")}
+                stroke="#8884d8"
+              />
+              <Line
+                type="monotone"
+                dataKey="expense"
+                name={t("Expense")}
+                stroke="#82ca9d"
+              />
+              <Line
+                type="monotone"
+                dataKey="savings"
+                name={t("Savings")}
+                stroke="#ffc658"
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="dark:bg-black">
         <CardHeader>
-          <CardTitle>{t("Income Distribution")}</CardTitle>
+          <CardTitle className="dark:text-white">
+            {t("Income Distribution")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -88,13 +125,18 @@ export default function Charts({ selectedDate }: ChartsProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) =>
+                  `${name} ${(percent * 100).toFixed(0)}%`
+                }
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
               >
                 {incomeData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip formatter={(value) => formatCurrency(value as number)} />
@@ -102,9 +144,11 @@ export default function Charts({ selectedDate }: ChartsProps) {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="dark:bg-black">
         <CardHeader>
-          <CardTitle>{t("Expense Distribution")}</CardTitle>
+          <CardTitle className="dark:text-white">
+            {t("Expense Distribution")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -114,13 +158,18 @@ export default function Charts({ selectedDate }: ChartsProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) =>
+                  `${name} ${(percent * 100).toFixed(0)}%`
+                }
                 outerRadius={80}
                 fill="#82ca9d"
                 dataKey="value"
               >
                 {expenseData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip formatter={(value) => formatCurrency(value as number)} />
@@ -129,6 +178,5 @@ export default function Charts({ selectedDate }: ChartsProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

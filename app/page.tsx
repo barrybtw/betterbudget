@@ -1,12 +1,14 @@
-"use client"
-import { FinanceProvider } from "../contexts/FinanceContext"
-import Dashboard from "../components/Dashboard"
+"use client";
+import { FinanceProvider } from "../contexts/FinanceContext";
+import { ThemeProvider } from "../components/ThemeProvider";
+import Dashboard from "../components/Dashboard";
 
 export default function Home() {
   return (
-    <FinanceProvider>
-      <Dashboard />
-    </FinanceProvider>
-  )
+    <ThemeProvider>
+      <FinanceProvider>
+        <Dashboard />
+      </FinanceProvider>
+    </ThemeProvider>
+  );
 }
-

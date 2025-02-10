@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IncomeExpense, useFinance } from "../contexts/FinanceContext";
+import { useFinance } from "../contexts/FinanceContext";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ import { t } from "../utils/translations";
 type AddEditItemModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  editingItem: IncomeExpense;
+  editingItem: any;
   selectedDate: Date;
 };
 
@@ -35,11 +35,11 @@ export default function AddEditItemModal({
   selectedDate,
 }: AddEditItemModalProps) {
   const { addItem, editItem } = useFinance();
-  const [item, setItem] = useState<IncomeExpense>({
+  const [item, setItem] = useState({
     id: "",
     type: "income",
     name: "",
-    amount: 0,
+    amount: "",
     recurrence: "once",
     endDate: "",
   });
@@ -52,7 +52,7 @@ export default function AddEditItemModal({
         id: "",
         type: "income",
         name: "",
-        amount: 0,
+        amount: "",
         recurrence: "once",
         endDate: "",
       });
@@ -66,7 +66,7 @@ export default function AddEditItemModal({
 
     const newItem = {
       ...item,
-      amount: item.amount,
+      amount: Number.parseFloat(item.amount as string),
       id: editingItem ? item.id : Date.now().toString(),
     };
 
@@ -120,7 +120,7 @@ export default function AddEditItemModal({
                 id="amount"
                 type="number"
                 value={item.amount}
-                onChange={(e) => setItem({ ...item, amount: +e.target.value })}
+                onChange={(e) => setItem({ ...item, amount: e.target.value })}
                 required
               />
             </div>
@@ -167,7 +167,7 @@ export default function AddEditItemModal({
             )}
           </div>
           <DialogFooter>
-            <Button type="submit">
+            <Button type="submit" className="mt-4">
               {editingItem ? t("Update") : t("Add")}
             </Button>
           </DialogFooter>

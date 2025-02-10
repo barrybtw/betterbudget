@@ -4,7 +4,7 @@ export const translations = {
   "Add Item": "Tilføj",
   Incomes: "Indtægter",
   Expenses: "Udgifter",
-  "Total Income": "Samlet Indtægter",
+  "Total Income": "Samlet Indtægt",
   "Total Expenses": "Samlede Udgifter",
   "Net Income": "Nettoindkomst",
   "Savings Rate": "Opsparingsrate",
@@ -34,12 +34,12 @@ export const translations = {
   Yearly: "Årlig",
   "End Date": "Slutdato",
   Optional: "Valgfri",
-  Add: "Tilføj",
-  Savings: "Opsparing",
+  "Target Amount": "Målbeløb",
+  "Monthly Savings": "Månedlig opsparing",
+  Target: "Mål",
+  Progress: "Fremskridt",
 };
 
-type TranslationKey = keyof typeof translations;
-
-export function t(key: TranslationKey): string {
+export function t(key: string): string {
   return translations[key] || key;
 }
