@@ -78,42 +78,6 @@ export default function Charts({ selectedDate }: ChartsProps) {
       <Card className="dark:bg-black">
         <CardHeader>
           <CardTitle className="dark:text-white">
-            {t("Monthly Overview")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={formatCurrency} />
-              <Tooltip formatter={formatCurrency} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="income"
-                name={t("Income")}
-                stroke="#8884d8"
-              />
-              <Line
-                type="monotone"
-                dataKey="expense"
-                name={t("Expense")}
-                stroke="#82ca9d"
-              />
-              <Line
-                type="monotone"
-                dataKey="savings"
-                name={t("Savings")}
-                stroke="#ffc658"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-      <Card className="dark:bg-black">
-        <CardHeader>
-          <CardTitle className="dark:text-white">
             {t("Income Distribution")}
           </CardTitle>
         </CardHeader>
