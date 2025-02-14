@@ -41,15 +41,13 @@ export const translations = {
   "Deposit to Savings": "Indsæt på opsparing",
   "Withdraw from Savings": "Hæv fra opsparing",
   "Savings Balance": "Opsparingsbalance",
+  Amount: "Beløb",
   Deposit: "Indsæt",
   Withdraw: "Hæv",
   "Insufficient savings balance": "Utilstrækkelig opsparingsbalance",
-  "Monthly Balance": "Månedlig balance",
-  "Monthly Income": "Månedlig indkomst",
-  "Monthly Expenses": "Månedlige udgifter",
-  "Monthly Rating": "Månedlig vurdering",
-};
+}
 
 export function t(key: string): string {
-  return translations[key] || key;
+  return translations[key] || key
 }
+

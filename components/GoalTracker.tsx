@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useFinance } from "../contexts/FinanceContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { t } from "../utils/translations";
+import useFinanceStore from "@/hooks/useFinanceStore";
 
 export default function GoalTracker() {
-  const { goals, addGoal, editGoal, deleteGoal } = useFinance();
+  const { goals, addGoal, editGoal, deleteGoal } = useFinanceStore();
   const [newGoal, setNewGoal] = useState({
     name: "",
     amount: "",
@@ -27,11 +27,10 @@ export default function GoalTracker() {
       newGoal.monthlySavings
     ) {
       addGoal({
-        id: Date.now().toString(),
         ...newGoal,
-        amount: Number.parseFloat(newGoal.amount),
-        monthlySavings: Number.parseFloat(newGoal.monthlySavings),
-        currentSavings: 0,
+        targetAmount: Number.parseFloat(newGoal.amount),
+        targetDate: newGoal.targetDate,
+        name: newGoal.name,
       });
       setNewGoal({ name: "", amount: "", targetDate: "", monthlySavings: "" });
     }
@@ -175,4 +174,3 @@ export default function GoalTracker() {
     </Card>
   );
 }
-

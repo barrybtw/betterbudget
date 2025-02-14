@@ -1,6 +1,5 @@
-import { Recurrence } from "@/contexts/FinanceContext";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 export type FinanceItem = {
   id: string;
@@ -9,7 +8,7 @@ export type FinanceItem = {
   amount: number;
   startDate: string; // ISO date string
   endDate?: string; // ISO date string, optional
-  recurrence: Recurrence;
+  recurrence: "once" | "monthly" | "yearly";
 };
 
 export type Goal = {
@@ -214,6 +213,8 @@ const useFinanceStore = create<FinanceStore>()(
       },
 
       depositToSavings: (amount, date) => {
+        console.log("Depositing to savings", amount, date);
+
         const newItem: Omit<FinanceItem, "id"> = {
           type: "savings-deposit",
           name: "Savings Deposit",
@@ -221,6 +222,7 @@ const useFinanceStore = create<FinanceStore>()(
           startDate: date.toISOString().split("T")[0],
           recurrence: "once",
         };
+
         get().addItem(newItem);
       },
 
