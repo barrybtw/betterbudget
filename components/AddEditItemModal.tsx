@@ -66,9 +66,9 @@ export default function AddEditItemModal({
     const newItem = {
       ...item,
       amount: Number(item.amount),
-      startDate: new Date().toISOString().split("T")[0], // Use current date as start date
+      startDate: selectedDate.toISOString().split("T")[0],
       endDate: item.endDate || undefined,
-    } as unknown as Omit<FinanceItem, "id">;
+    } as Omit<FinanceItem, "id">;
 
     if (editingItem) {
       editItem(editingItem.id, newItem);
