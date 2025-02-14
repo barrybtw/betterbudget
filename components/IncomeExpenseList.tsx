@@ -1,4 +1,4 @@
-import { useFinance } from "../contexts/FinanceContext";
+import useFinanceStore from "../hooks/useFinanceStore";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Pencil, Trash2, RepeatIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,18 +15,23 @@ export default function IncomeExpenseList({
   onAddItem,
   onEditItem,
 }: IncomeExpenseListProps) {
-  const { financeData, deleteItem } = useFinance();
+  const { items, deleteItem } = useFinanceStore();
 
-  const year = selectedDate.getFullYear().toString();
-  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
-  const monthData = financeData[year]?.[month] || { incomes: [], expenses: [] };
-
-  const handleDelete = (id: string, type: "income" | "expense") => {
-    deleteItem(year, month, id, type);
+  const handleDelete = (id: string) => {
+    deleteItem(id);
   };
 
+  const filteredItems = items.filter(
+    (item) =>
+      new Date(item.startDate) <= selectedDate &&
+      (!item.endDate || new Date(item.endDate) >= selectedDate)
+  );
+
+  const incomes = filteredItems.filter((item) => item.type === "income");
+  const expenses = filteredItems.filter((item) => item.type === "expense");
+
   const renderList = (items, type) => (
-    <ScrollArea className="h-[175px] w-full pr-4">
+    <ScrollArea className="h-[300px] w-full pr-4">
       <ul className="space-y-2">
         {items.map((item) => (
           <li
@@ -39,9 +44,7 @@ export default function IncomeExpenseList({
           >
             <span className="flex items-center dark:text-white">
               {item.name}
-              {item.recurrence !== "once" && (
-                <RepeatIcon className="ml-2 h-4 w-4" />
-              )}
+              {!item.endDate && <RepeatIcon className="ml-2 h-4 w-4" />}
             </span>
             <div className="flex items-center">
               <span className="mr-4 dark:text-white">
@@ -60,7 +63,7 @@ export default function IncomeExpenseList({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => handleDelete(item.id, type)}
+                onClick={() => handleDelete(item.id)}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -82,11 +85,11 @@ export default function IncomeExpenseList({
       <div className="space-y-6">
         <div>
           <h3 className="text-xl font-semibold mb-2">{t("Incomes")}</h3>
-          {renderList(monthData.incomes, "income")}
+          {renderList(incomes, "income")}
         </div>
         <div>
           <h3 className="text-xl font-semibold mb-2">{t("Expenses")}</h3>
-          {renderList(monthData.expenses, "expense")}
+          {renderList(expenses, "expense")}
         </div>
       </div>
     </div>

@@ -1,20 +1,9 @@
 "use client";
 
-import { useFinance } from "../contexts/FinanceContext";
+import { useEffect, useState } from "react";
+import useFinanceStore from "../hooks/useFinanceStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { t } from "../utils/translations";
 
 type ChartsProps = {
@@ -31,46 +20,55 @@ const COLORS = [
 ];
 
 export default function Charts({ selectedDate }: ChartsProps) {
-  const { financeData } = useFinance();
+  const { getMonthlyData, items } = useFinanceStore();
+  const [isClient, setIsClient] = useState(false);
 
-  const year = selectedDate.getFullYear().toString();
-  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
-  const monthData = financeData[year]?.[month] || { incomes: [], expenses: [] };
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  const incomeData = monthData.incomes.map((income) => ({
-    name: income.name,
-    value: income.amount,
-  }));
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth();
 
-  const expenseData = monthData.expenses.map((expense) => ({
-    name: expense.name,
-    value: expense.amount,
-  }));
-
-  const monthlyData = Object.entries(financeData[year] || {}).map(
-    ([month, data]) => {
-      const totalIncome = data.incomes.reduce(
-        (sum, income) => sum + income.amount,
-        0
+  const incomeData = items
+    .filter((item) => {
+      const itemDate = new Date(item.startDate);
+      return (
+        item.type === "income" &&
+        ((itemDate.getFullYear() === year && itemDate.getMonth() === month) ||
+          item.recurrence === "monthly" ||
+          (item.recurrence === "yearly" && itemDate.getMonth() === month)) &&
+        (!item.endDate || new Date(item.endDate) >= selectedDate)
       );
-      const totalExpense = data.expenses.reduce(
-        (sum, expense) => sum + expense.amount,
-        0
+    })
+    .map((income) => ({
+      name: income.name,
+      value: income.amount,
+    }));
+
+  const expenseData = items
+    .filter((item) => {
+      const itemDate = new Date(item.startDate);
+      return (
+        item.type === "expense" &&
+        ((itemDate.getFullYear() === year && itemDate.getMonth() === month) ||
+          item.recurrence === "monthly" ||
+          (item.recurrence === "yearly" && itemDate.getMonth() === month)) &&
+        (!item.endDate || new Date(item.endDate) >= selectedDate)
       );
-      return {
-        name: month,
-        income: totalIncome,
-        expense: totalExpense,
-        savings: totalIncome - totalExpense,
-      };
-    }
-  );
+    })
+    .map((expense) => ({
+      name: expense.name,
+      value: expense.amount,
+    }));
 
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("da-DK", {
-      style: "currency",
-      currency: "DKK",
-    });
+    return isClient
+      ? value.toLocaleString("da-DK", {
+          style: "currency",
+          currency: "DKK",
+        })
+      : "0,00 kr.";
   };
 
   return (

@@ -38,6 +38,16 @@ export const translations = {
   "Monthly Savings": "Månedlig opsparing",
   Target: "Mål",
   Progress: "Fremskridt",
+  "Deposit to Savings": "Indsæt på opsparing",
+  "Withdraw from Savings": "Hæv fra opsparing",
+  "Savings Balance": "Opsparingsbalance",
+  Deposit: "Indsæt",
+  Withdraw: "Hæv",
+  "Insufficient savings balance": "Utilstrækkelig opsparingsbalance",
+  "Monthly Balance": "Månedlig balance",
+  "Monthly Income": "Månedlig indkomst",
+  "Monthly Expenses": "Månedlige udgifter",
+  "Monthly Rating": "Månedlig vurdering",
 };
 
 export function t(key: string): string {

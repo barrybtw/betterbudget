@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IncomeExpense, useFinance } from "../contexts/FinanceContext";
+import useFinanceStore from "../hooks/useFinanceStore";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { t } from "../utils/translations";
+import { IncomeExpense, Recurrence } from "@/contexts/FinanceContext";
 
 type AddEditItemModalProps = {
   isOpen: boolean;
@@ -34,29 +35,27 @@ export default function AddEditItemModal({
   editingItem,
   selectedDate,
 }: AddEditItemModalProps) {
-  const { addItem, editItem } = useFinance();
-  const [item, setItem] = useState({
-    id: "",
+  const { addItem, editItem } = useFinanceStore();
+  const [item, setItem] = useState<Omit<IncomeExpense, "id">>({
     type: "income",
     name: "",
-    amount: "",
+    amount: 0,
     recurrence: "once",
     endDate: "",
   });
-  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (editingItem) {
       setItem({
         ...editingItem,
-        amount: editingItem.amount.toString(),
+        amount: editingItem.amount,
+        endDate: editingItem.endDate || "",
       });
     } else {
       setItem({
-        id: "",
         type: "income",
         name: "",
-        amount: "",
+        amount: 0,
         recurrence: "once",
         endDate: "",
       });
@@ -65,56 +64,19 @@ export default function AddEditItemModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const year = selectedDate.getFullYear().toString();
-    const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
-
     const newItem = {
       ...item,
-      amount: Number.parseFloat(item.amount) || 0,
-      id: editingItem ? item.id : Date.now().toString(),
+      amount: Number(item.amount),
+      startDate: new Date().toISOString().split("T")[0], // Use current date as start date
+      endDate: item.endDate || undefined,
     };
 
-    if (newItem.type !== "income" && newItem.type !== "expense") {
-      return;
-    }
-
     if (editingItem) {
-      editItem(year, month, newItem as IncomeExpense);
+      editItem(editingItem.id, newItem);
     } else {
-      addItem(year, month, newItem as IncomeExpense);
+      addItem(newItem);
     }
     onClose();
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === "" || /^\d*\.?\d*$/.test(value)) {
-      setItem({ ...item, amount: value });
-    }
-  };
-
-  const handleAmountFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleAmountBlur = () => {
-    setIsFocused(false);
-    if (item.amount === "") {
-      setItem({ ...item, amount: "0" });
-    } else {
-      // Ensure the amount is a valid number with at most 2 decimal places
-      const formattedAmount = Number.parseFloat(item.amount).toFixed(2);
-      setItem({ ...item, amount: formattedAmount });
-    }
-  };
-
-  const formatAmount = (amount: string) => {
-    const num = Number.parseFloat(amount);
-    if (isNaN(num)) return "";
-    return num.toLocaleString("da-DK", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
   };
 
   return (
@@ -157,12 +119,9 @@ export default function AddEditItemModal({
               <Label htmlFor="amount">{t("Amount")} (DKK)</Label>
               <Input
                 id="amount"
-                type="text"
-                inputMode="decimal"
-                value={isFocused ? item.amount : formatAmount(item.amount)}
-                onChange={handleAmountChange}
-                onFocus={handleAmountFocus}
-                onBlur={handleAmountBlur}
+                type="number"
+                value={item.amount}
+                onChange={(e) => setItem({ ...item, amount: +e.target.value })}
                 required
               />
             </div>
@@ -173,11 +132,7 @@ export default function AddEditItemModal({
                 onValueChange={(value) =>
                   setItem({
                     ...item,
-                    recurrence: value as
-                      | "once"
-                      | "monthly"
-                      | "quarterly"
-                      | "yearly",
+                    recurrence: value as Recurrence,
                   })
                 }
               >
@@ -187,7 +142,6 @@ export default function AddEditItemModal({
                 <SelectContent>
                   <SelectItem value="once">{t("Once")}</SelectItem>
                   <SelectItem value="monthly">{t("Monthly")}</SelectItem>
-                  <SelectItem value="quarterly">{t("Quarterly")}</SelectItem>
                   <SelectItem value="yearly">{t("Yearly")}</SelectItem>
                 </SelectContent>
               </Select>
