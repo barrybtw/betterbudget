@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 export type FinanceItem = {
   id: string;
-  type: "income" | "expense" | "savings-deposit" | "savings-withdrawal";
+  type: "income" | "expense";
   name: string;
   amount: number;
   startDate: string; // ISO date string
@@ -15,7 +15,6 @@ export type Goal = {
   id: string;
   name: string;
   targetAmount: number;
-  currentAmount: number;
   targetDate: string; // ISO date string
 };
 
@@ -33,16 +32,12 @@ type FinanceStore = {
   addItem: (item: Omit<FinanceItem, "id">) => void;
   editItem: (id: string, item: Omit<FinanceItem, "id">) => void;
   deleteItem: (id: string) => void;
-  addGoal: (goal: Omit<Goal, "id" | "currentAmount">) => void;
+  addGoal: (goal: Omit<Goal, "id">) => void;
   editGoal: (id: string, goal: Omit<Goal, "id">) => void;
   deleteGoal: (id: string) => void;
-  updateGoalProgress: (id: string, amount: number) => void;
   getBalance: (date: Date) => number;
-  getSavings: (date: Date) => number;
   getMonthlyData: (year: number, month: number) => MonthlyData;
   recalculateAllBalances: () => void;
-  depositToSavings: (amount: number, date: Date) => void;
-  withdrawFromSavings: (amount: number, date: Date) => void;
 };
 
 const useFinanceStore = create<FinanceStore>()(
@@ -77,10 +72,7 @@ const useFinanceStore = create<FinanceStore>()(
 
       addGoal: (goal) =>
         set((state) => ({
-          goals: [
-            ...state.goals,
-            { ...goal, id: Date.now().toString(), currentAmount: 0 },
-          ],
+          goals: [...state.goals, { ...goal, id: Date.now().toString() }],
         })),
 
       editGoal: (id, updatedGoal) =>
@@ -95,29 +87,12 @@ const useFinanceStore = create<FinanceStore>()(
           goals: state.goals.filter((goal) => goal.id !== id),
         })),
 
-      updateGoalProgress: (id, amount) =>
-        set((state) => ({
-          goals: state.goals.map((goal) =>
-            goal.id === id
-              ? { ...goal, currentAmount: goal.currentAmount + amount }
-              : goal
-          ),
-        })),
-
       getBalance: (date) => {
         const { monthlyData } = get();
         const key = `${date.getFullYear()}-${String(
           date.getMonth() + 1
         ).padStart(2, "0")}`;
         return monthlyData[key]?.balance || 0;
-      },
-
-      getSavings: (date) => {
-        const { monthlyData } = get();
-        const key = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}`;
-        return monthlyData[key]?.savings || 0;
       },
 
       getMonthlyData: (year, month) => {
@@ -210,31 +185,6 @@ const useFinanceStore = create<FinanceStore>()(
         }
 
         set({ monthlyData: newMonthlyData });
-      },
-
-      depositToSavings: (amount, date) => {
-        console.log("Depositing to savings", amount, date);
-
-        const newItem: Omit<FinanceItem, "id"> = {
-          type: "savings-deposit",
-          name: "Savings Deposit",
-          amount,
-          startDate: date.toISOString().split("T")[0],
-          recurrence: "once",
-        };
-
-        get().addItem(newItem);
-      },
-
-      withdrawFromSavings: (amount, date) => {
-        const newItem: Omit<FinanceItem, "id"> = {
-          type: "savings-withdrawal",
-          name: "Savings Withdrawal",
-          amount,
-          startDate: date.toISOString().split("T")[0],
-          recurrence: "once",
-        };
-        get().addItem(newItem);
       },
     }),
     {

@@ -15,24 +15,18 @@ export default function GoalTracker() {
     name: "",
     amount: "",
     targetDate: "",
-    monthlySavings: "",
   });
   const [editingGoal, setEditingGoal] = useState(null);
 
   const handleAddGoal = () => {
-    if (
-      newGoal.name &&
-      newGoal.amount &&
-      newGoal.targetDate &&
-      newGoal.monthlySavings
-    ) {
+    if (newGoal.name && newGoal.amount && newGoal.targetDate) {
       addGoal({
         ...newGoal,
         targetAmount: Number.parseFloat(newGoal.amount),
         targetDate: newGoal.targetDate,
         name: newGoal.name,
       });
-      setNewGoal({ name: "", amount: "", targetDate: "", monthlySavings: "" });
+      setNewGoal({ name: "", amount: "", targetDate: "" });
     }
   };
 
@@ -42,24 +36,22 @@ export default function GoalTracker() {
       name: goal.name,
       amount: goal.amount.toString(),
       targetDate: goal.targetDate,
-      monthlySavings: goal.monthlySavings.toString(),
     });
   };
 
   const handleUpdateGoal = () => {
     if (editingGoal) {
-      editGoal({
+      editGoal(editingGoal.id, {
         ...editingGoal,
         ...newGoal,
         amount: Number.parseFloat(newGoal.amount),
-        monthlySavings: Number.parseFloat(newGoal.monthlySavings),
       });
       setEditingGoal(null);
-      setNewGoal({ name: "", amount: "", targetDate: "", monthlySavings: "" });
+      setNewGoal({ name: "", amount: "", targetDate: "" });
     }
   };
 
-  const handleDeleteGoal = (id) => {
+  const handleDeleteGoal = (id: string) => {
     deleteGoal(id);
   };
 
@@ -87,16 +79,9 @@ export default function GoalTracker() {
             <Input
               type="date"
               value={newGoal.targetDate}
+              className="col-span-2"
               onChange={(e) =>
                 setNewGoal({ ...newGoal, targetDate: e.target.value })
-              }
-            />
-            <Input
-              type="number"
-              placeholder={t("Monthly Savings")}
-              value={newGoal.monthlySavings}
-              onChange={(e) =>
-                setNewGoal({ ...newGoal, monthlySavings: e.target.value })
               }
             />
           </div>
@@ -135,36 +120,12 @@ export default function GoalTracker() {
                 </div>
                 <div className="text-sm dark:text-gray-300 mb-2">
                   {t("Target")}:{" "}
-                  {goal.amount.toLocaleString("da-DK", {
+                  {goal.targetAmount.toLocaleString("da-DK", {
                     style: "currency",
                     currency: "DKK",
                   })}{" "}
                   {t("by")}{" "}
                   {new Date(goal.targetDate).toLocaleDateString("da-DK")}
-                </div>
-                <div className="text-sm dark:text-gray-300 mb-2">
-                  {t("Monthly Savings")}:{" "}
-                  {goal.monthlySavings.toLocaleString("da-DK", {
-                    style: "currency",
-                    currency: "DKK",
-                  })}
-                </div>
-                <Progress
-                  value={(goal.currentSavings / goal.amount) * 100}
-                  className="h-2 mb-2"
-                />
-                <div className="text-sm dark:text-gray-300">
-                  {t("Progress")}:{" "}
-                  {goal.currentSavings.toLocaleString("da-DK", {
-                    style: "currency",
-                    currency: "DKK",
-                  })}{" "}
-                  /{" "}
-                  {goal.amount.toLocaleString("da-DK", {
-                    style: "currency",
-                    currency: "DKK",
-                  })}{" "}
-                  ({((goal.currentSavings / goal.amount) * 100).toFixed(1)}%)
                 </div>
               </li>
             ))}

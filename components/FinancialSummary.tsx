@@ -12,7 +12,7 @@ type FinancialSummaryProps = {
 export default function FinancialSummary({
   selectedDate,
 }: FinancialSummaryProps) {
-  const { getMonthlyData, getBalance, getSavings } = useFinanceStore();
+  const { getMonthlyData, getBalance } = useFinanceStore();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export default function FinancialSummary({
 
   const monthlyData = getMonthlyData(year, month);
   const totalBalance = getBalance(selectedDate);
-  const savingsBalance = getSavings(selectedDate);
 
   const savingsRate =
     monthlyData.income > 0
