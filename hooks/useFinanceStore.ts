@@ -118,7 +118,7 @@ const useFinanceStore = create<FinanceStore>()(
         const startDate = new Date(sortedItems[0]?.startDate || new Date());
         startDate.setMonth(startDate.getMonth() - 1); // Start from the month before the first transaction
         const endDate = new Date();
-        endDate.setFullYear(endDate.getFullYear() + 1); // Calculate for one year in the future
+        endDate.setFullYear(endDate.getFullYear() + 100); // Calculate for one year in the future
 
         const currentDate = new Date(startDate);
 
